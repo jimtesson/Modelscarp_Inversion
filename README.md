@@ -228,16 +228,16 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 	e.g: for the chain 2, the result file is named: “2_results.txt”
 	
 	Each line of the file is a step of the chain (= an accepted model). On a line you will find:
-	
-	    ```{r, engine='bash'}
+
+    ```{r, engine='bash'}
 	Number of events, Slip-rate (mm/yr) Quiescence period length (kyr, if searched), event ages, event slips, rmsw.
-	    ```
-	    
+    ```
+    
 	e.g: the following model is composed of 2 events at 8291 and 9047 yr with a slip of 997 and 602 cm, a peri-glacial slip-rate of 3.52 mm/yr and no quiescence period. The RMSw of the model is 333.78.
 	
-	```{r, engine='bash'}
-		 2, 3.52, 8291 9047, 997.253505 602.746495, 333.78
-    	```
-	    
+    ```{r, engine='bash'}
+	2, 3.52, 8291 9047, 997.253505 602.746495, 333.78
+    ```
+
 6. At the end of the inversion, the results of each chain are avalaible in the folder 'results'. 
 
