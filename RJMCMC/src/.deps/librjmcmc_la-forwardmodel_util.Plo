@@ -1,0 +1,33 @@
+librjmcmc_la-forwardmodel_util.lo: forwardmodel_util.c \
+ /opt/local/lib/gcc6/gcc/x86_64-apple-darwin16/6.4.0/include-fixed/math.h \
+ /usr/include/sys/cdefs.h /usr/include/sys/_symbol_aliasing.h \
+ /usr/include/sys/_posix_availability.h /usr/include/Availability.h \
+ /usr/include/AvailabilityInternal.h \
+ /opt/local/lib/gcc6/gcc/x86_64-apple-darwin16/6.4.0/include/float.h \
+ ../include/rjmcmc/forwardmodel_util.h ../include/rjmcmc/rjmcmc_debug.h \
+ /opt/local/lib/gcc6/gcc/x86_64-apple-darwin16/6.4.0/include/stdarg.h \
+ ../include/rjmcmc/rjmcmc.h ../include/rjmcmc/rjmcmc_config.h
+
+/opt/local/lib/gcc6/gcc/x86_64-apple-darwin16/6.4.0/include-fixed/math.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/sys/_symbol_aliasing.h:
+
+/usr/include/sys/_posix_availability.h:
+
+/usr/include/Availability.h:
+
+/usr/include/AvailabilityInternal.h:
+
+/opt/local/lib/gcc6/gcc/x86_64-apple-darwin16/6.4.0/include/float.h:
+
+../include/rjmcmc/forwardmodel_util.h:
+
+../include/rjmcmc/rjmcmc_debug.h:
+
+/opt/local/lib/gcc6/gcc/x86_64-apple-darwin16/6.4.0/include/stdarg.h:
+
+../include/rjmcmc/rjmcmc.h:
+
+../include/rjmcmc/rjmcmc_config.h:

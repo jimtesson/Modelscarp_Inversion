@@ -1,0 +1,3 @@
+librjmcmc_la-bbox2d.lo: bbox2d.c ../include/rjmcmc/bbox2d.h
+
+../include/rjmcmc/bbox2d.h:

@@ -1,0 +1,8 @@
+rjmcmc.i
+rjmcmc.py
+rjmcmc_helper.c
+setup.py
+rjmcmc.egg-info/PKG-INFO
+rjmcmc.egg-info/SOURCES.txt
+rjmcmc.egg-info/dependency_links.txt
+rjmcmc.egg-info/top_level.txt

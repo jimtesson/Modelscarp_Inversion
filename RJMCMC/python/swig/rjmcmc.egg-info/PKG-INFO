@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: rjmcmc
+Version: 0.9.15
+Summary: Python interface to the 1D regression routines of the rjmcmc library
+Home-page: http://inverse.anu.edu.au
+Author: Rhys Hawkins <Rhys.Hawkins@anu.edu.au>
+Author-email: Rhys.Hawkins@anu.edu.au
+License: GPL
+Description-Content-Type: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN

@@ -1,0 +1,77 @@
+
+OVERVIEW
+
+This code computes the Receiver Function inversion using a
+Trans-dimensional Bayesian approach. This code is based on code
+written by Thomas Bodin and is described in his Thesis and the
+publication below:
+
+  "Transdimensional Approaches to Geophysical Inverse Problems",
+  Thomas Bodin,  
+  PhD Thesis, October 2010, Australian National University
+
+  "Transdimensional inversion of receiver functions and surface wave dispersion",
+  Bodin, T., Sambridge, M., Tkalčić, H., Arroucau, P., Gallagher, K., and Rawlinson, N., 
+  J. Geophys. Res., 117, B02301. doi:10.1029/2011JB008560. 
+
+Note that this code implements the Gaussian Correlation error model as
+described in the above paper.
+
+INSTALLING
+
+The software requires the rjmcmc library and if this prerequisite is
+in a standard place then you can compile this software with the
+following commands:
+
+> ./configure
+> make
+
+and optionally:
+
+> sudo make install
+
+The Rf software uses pkg-config to configure itself while building. If
+the rjmcmc library is installed into a non-standard directory (eg a
+users home directory) or to a path that is not by default in
+pkg-config's search path then you will need to set the PKG_CONFIG_PATH
+environment variable, eg for bash users:
+
+> export PKG_CONFIG_PATH=/opt/rjmcmc/lib/pkg-config
+> ./configure
+> make
+
+QUICKSTART
+
+To run, you need to supply as a minium a data file to the program, so
+at a minimum, the following command line would run a Receiver function
+inversion (with the example dataset supplied with the source):
+
+> rf -d data/RF_obs.dat
+
+Other command line options can found by running the programs with the
+"-h" command line option, ie
+
+> rf -h
+
+The recommended method for running the rf applications is using
+namelist input files.  An example namelist file is provided in the
+data subdirectory and this file is commented to describe the different
+parameters.
+
+FILE FORMATS
+
+The input data file format is a simple space separated ASCII text
+file of the input signal. See the data/RF_obs.dat file for an 
+example.
+
+TUTORIAL
+
+There is a tutorial introduction to using this software in the
+tutorial subdirectory. This document is prepared in latex and can be
+regenerated using:
+
+> cd tutorial
+> pdflatex tutorial.tex
+
+It is recommended that new users run through this tutorial as a
+starting point.
