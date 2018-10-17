@@ -88,7 +88,7 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 	cd Modelscarp_Inversion
 	Export PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/Users/Jim/RJMCMC/bin/lib/pkgconfig
     ```
-   replace "/export/home/RJMCMC/bin/lib/pkgconfig" by your path
+   replace "/Users/Jim/RJMCMC/bin/lib/pkgconfig" by your path
     
 2. Configure the install file
     ```{r, engine='bash'}
