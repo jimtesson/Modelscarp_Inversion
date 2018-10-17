@@ -22,7 +22,8 @@
         - Tesson J. at jim.tesson@gmail.com, or
         - Benedetti L. at benedetti@cerege.fr
 
-Modelscarp Inversion is a program to find the best exhumation scenario of a bedrock fault-plane using <sup>36</sup>Cl concentrations. It is based on a direct problem (Modelscarp from Schlagenhauf et al. [2010]) that enables to calculate theoretical <sup>36</sup>Cl concentrations from an exhumation history. This direct problem is used by the Neighboorhood algorithm (Sambrdige 1999) to find the best scenario explaining the data (measured <sup>36</sup>Cl concentrations in the fault-plane). 
+Constraining the past seismic activity and the slip-rates of faults over several millennials is crucial for seismic hazard assessment. Chlorine 36 (36Cl) in situ produced cosmogenic nuclide is increasingly used to retrieve past earthquakes histories on seismically exhumed limestone normal fault-scarps. Following Schlagenhauf et al., [2010] modelling approach, we present a new methodology to retrieve the exhumation history based on a Bayesian transdimensional inversion of the 36Cl data. This procedure uses the reversible jump Markov chains Monte-Carlo algorithm (RJ-MCMC, Green [1995]) which enables 1-exploring the parameter space (number of events, age and slip of the events), 2-finding the more probable scenarios, and 3-precisely quantifying the associated uncertainties. Through a series of synthetic tests, the algorithm revealed a great capacity to constrain event slips and ages in a short computational time (several days) with a precision that can reach 0.1 ky and 0.5 m for the age and slip of exhumation event, respectively. In addition, our study show that the amount of 36Cl accumulated when the sampled fault-plane was still buried under the colluvial wedge, prior  its exhumation, might represents up to 35 % of the total 36Cl. This contribution can be accurately determined with a depth profile, reducing uncertainty on the exhumation scenario.
+
 
 Please cite the use of this code using the following DOI:
 
@@ -31,26 +32,40 @@ Please cite the use of this code using the following DOI:
 
 ## Getting Started
 
-Modelscarp Inversion has a graphical interface running under Matlab which enable to setup an inversion, to run it and plot the results. This interface calls compiled fortran programs to achieve the inversion. For this reason the use of Modelscarp Inversion requires an installation and the compilation of those program. Those program can be run independantly from the graphical interface.
-
-
+The inversion of the 36Cl data is based on a modified version of the RJMcMC algorithm provided by Gallagher et al. (2011) (http://www.iearth.org.au/codes/rj-MCMC/). It is thus required to first install the RJMCMC library, and then install the inversion routine.
 
 ### Prerequisites
 
 To use Modelscarp Inversion, you will need:
 
 - an Unix system (OSX, Linux...)
-- Matlab (at least 2012b)
+- an MPI library (e.g. openMPI)
 - a C compiler (e.g. gcc, https://gcc.gnu.org)
 - a Fortran compiler (e.g. gfortran that is included in gcc)
 - Makefile (https://www.gnu.org/software/make/)
 
-### Installing
+### How to install the library RJ-McMC
 
-The graphical interface of Modelscarp inversion help you to install the programs. 
-1. Start Matlab
+The RJ-McMC library is provided in the folder RJMCMC. The installation is operated using your terminal.
 
-2. go in the Modelscarp Inversion folder
+1.  Specify the path for the mpi library in the terminal
+	for instance: 
+    ```{r, engine='bash'}
+    PATH=$PATH:/export/apps/mpich2/bin
+    ```
+    replace "/export/apps/mpich2/bin" by the absolute path of your mpi library.
+
+2. Configure the install file
+	for instance: 
+    ```{r, engine='bash'}
+    ./configure --prefix=/Users/Jim/Documents/Work/Transdimensional/Modelscarp_RJ-McMC/RJMCMC-4/bin --with-openmpi-include-path /opt/local/include/openmpi-mp --with-openmpi-lib-path=/opt/local/lib/openmpi-mp
+
+    ```
+	Options:
+	--prefix : specify the path of the bin folder where the RJ-McMC library will be installed.
+	--with-openmpi-lib-path= specify the path of the “lib” folder of your mpi library.
+	--with-openmpi-include-path= specify the path of “include” folder of your the mpi library.
+
 
 3. Start the graphical interface with the command: `Modelscarp_inversion`
 
