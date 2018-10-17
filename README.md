@@ -44,6 +44,36 @@ To use Modelscarp Inversion, you will need:
 - a Fortran compiler (e.g. gfortran that is included in gcc)
 - Makefile (https://www.gnu.org/software/make/)
 
+
+
+ ### Structure of the Modelscarp_inversion directory
+ 
+```
+******** Content of the Modelscarp_inversion folder ******** 
+
+
+|
+└─── Bin							->  folder containing the Modelscarp_inversion executable
+|
+└─── Data  							->  folder containing the data 
+
+		* data.txt					->  chemical composition of the samples from the fault-planes
+		* coll.txt					->  chemical composition of the colluvial wedge
+		* sf.txt					->  scaling factors over the time for fast neutrons and muons
+											
+│   
+└─── modelscarp_parameter					
+		* param_site.in					->  file containing the parameters of the site and of the inversion
+│   
+└─── Results						->  folder containing the results files
+										
+│   
+└─── src						->  folder containing the source files
+											
+
+```
+ 
+
 ### How to install the library RJ-McMC
 
 The RJ-McMC library is provided in the folder RJMCMC. The installation is operated using your terminal.
@@ -51,6 +81,7 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 1.  Specify the path for the mpi library in the terminal
 	for instance: 
     ```{r, engine='bash'}
+    cd RJMCMC
     PATH=$PATH:/export/apps/mpich2/bin
     ```
     replace "/export/apps/mpich2/bin" by the absolute path of your mpi library.
@@ -62,101 +93,38 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 
     ```
 	Options:
-	--prefix : specify the path of the bin folder where the RJ-McMC library will be installed.
-	--with-openmpi-lib-path= specify the path of the “lib” folder of your mpi library.
-	--with-openmpi-include-path= specify the path of “include” folder of your the mpi library.
+--prefix : specify the path of the bin folder where the RJ-McMC library will be installed.
+--with-openmpi-lib-path= specify the path of the “lib” folder of your mpi library.
+--with-openmpi-include-path= specify the path of “include” folder of your the mpi library.
 
 
-3. Start the graphical interface with the command: `Modelscarp_inversion`
+3. Install the RJ-McMC library : 
+    ```{r, engine='bash'}
+	make clean
+	make
+	make install
+    ```
 
-    <img src="Tutorial/images/Modelscarp_inversion_menu.png" width="500">
-4. Start the assistant clicking `Configure modelscarp for your computer`
+###  Installation of the program Modelscarp Inversion
 
-    <img src="Tutorial/images/Modelscarp_inversion_installation.png" width="500">
-5. Fill the command name for the C compiler and fortran compiler
-6. Test those commands in the terminal (not Matlab) to check if they are working.
+1.Specify the "pkgconfig" path localized in the directory of RJMCMC (bin/lib/pkconfig) 
+ 
+    ```{r, engine='bash'}
+	cd Modelscarp_Inversion
+	Export PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/export/home/RJMCMC/bin/lib/pkgconfig
+    ```
+   replace "/export/home/RJMCMC/bin/lib/pkgconfig" by your path
     
-    For instance in our case:
-
+2. Configure the install file
     ```{r, engine='bash'}
-    gcc
-    gfortran
-    make
+	./configure F77=mpif90 FC=mpif90
+	make clean
+	make rf_mpi
     ```
-7. If those commands are working well, click on `Set up` to prepare compiler files.
-8. When set up is done, open your terminal (not Matlab) and type the proposed commands.
-For instance in our case:
+    F77= specify the mpi fortran compiler command (here it is "mpif90") 
+    FC= specify the mpi #C compiler command (here it is "mpif90") 
+    
 
-    ```{r, engine='bash'}
-    cd /Users/Jim/Desktop/Modelscarp_V2/Install/src_modelscarp/src
-    ```
-    ```{r, engine='bash'}
-    make clean
-    ```
-    ```{r, engine='bash'}
-    make serial
-    ```
-9. When the work is done, click on `Finish the intallation`
- 
-
- ---
-
-
-**If you plan to use modelscarp on a cluster**, you have to configure the program using the graphical interface of Modelscarp inversion.
-
-1. Start the assistant by clicking `Configure modelscarp for a cluster` on the Menu.
-
-	<img src="Tutorial/images/Modelscarp_inversion_menu_2.png" width="500">
-2. Fill the command names for the C, the fortran, and the MPI Fortran compilers. **Make sure those compilers and Makefile are installed on the cluster**. Prior each inversion the program will be compiled on the cluster.
-
-    <img src="Tutorial/images/Modelscarp_inversion_installation_cluster.png" width="500">
-3. Test those commands in the terminal of the cluster (not Matlab).
-4. If those commands are working well, click on `Set up` to prepare compiler files.
-5. When set up is done, finish the installation by clicking on `Finish the intallation`.
-
- ### Structure of the Modelscarp_inversion directory
- 
-```
-******** Content of the Modelscarp_inversion folder ******** 
-
-|
-│  	* Modelscarp_inversion.m  		->  Main program (Matlab executable)
-│	* README.md						->  Tutorial
-
-|
-└─── Data  							->  folder containing the data 
-		│   
-		└─── MA3							->  Example of dataset from 
-											(Schlagenhauf et al. 2010)
-
-│   
-└─── Inversions						->  folder containing your projects 
-										of inversion
-		│   
-		└─── SINGLE_INV						->  Example of inversion 
-												"single inversion case"
-		│   
-		└─── MULT_INV						->  Example of inversion 
-												"multiple inversion case"
-												
-												
-												
-******** Other directories required for the program *******												
-│   
-└─── MGui							->  folder containing the Matlab 
-											code for the interface  
-										
-└─── Tutorial						->  folder containing data for 
-											the tutorial
-│   
-└─── Direct_model					->  folder containing the direct model
-											(Matlab code)
-│   
-└─── Install						->  script to install and configure 
-										the inversion program
-
-```
- 
 
 ## How to desing and start an inversion ?
 
