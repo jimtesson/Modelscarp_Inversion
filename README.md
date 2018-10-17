@@ -138,7 +138,7 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 - The **post glacial exhumation history** of the fault-plane that usually includes a part of the fault-plane that has been sampled (the best preserved), and the top-most part of the fault-plane that has not been sampled because the fault-plane is too eroded. This history is parameterized by the **number of exhumation events**, their **ages**, and their **amplitude (slip)**.
 
 
-### Create a new project Single inversion
+### Inverse your dataset
 1. Prepare the data files in the “data” folder, (following the excel sheet `Format_your_data.xls`):
 	- data.txt : chemical data of the samples belonging to the bedrock fault-plane
 	- coll.txt : chemical composition of the colluvial wedge
@@ -165,7 +165,7 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 	####################################################
 	#       Site Parameters
 	####################################################
-	800 : Total height of the scarp (cm)
+	800 : Total height of the post-glacial scarp (cm)
 	200 : Maximum sample depth (cm below the colluvial wedge surface)
 	0.0 : Erosion rate (mm/yr)
 	#### Fault-scarp geometry
@@ -193,7 +193,7 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 	300000 : duration (yr)
 	#### Quiescence period
 	y : Include a quiescence period prior the exhumation of the scarp ? (y/n)
-	50000 : max age of the scarp top if quiescence is searched (yr)
+	50000 : max quiescence period length if it is searched (yr)
 	2000.0 : Std dev. of scarp top age (yr)
 	#### Number of events
 	3 : Minimum number of events
