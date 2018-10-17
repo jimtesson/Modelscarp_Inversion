@@ -44,34 +44,6 @@ To use Modelscarp Inversion, you will need:
 - a Fortran compiler (e.g. gfortran that is included in gcc)
 - Makefile (https://www.gnu.org/software/make/)
 
-
-
- ### Structure of the Modelscarp_inversion directory
- 
-```
-******** Content of the Modelscarp_inversion folder ******** 
-
-
-|
-└─── Bin							->  folder containing the Modelscarp_inversion executable
-|
-└─── Data  							->  folder containing the data 
-
-		* data.txt					->  chemical composition of the samples from the fault-planes
-		* coll.txt					->  chemical composition of the colluvial wedge
-		* sf.txt					->  scaling factors over the time for fast neutrons and muons
-											
-│   
-└─── modelscarp_parameter					
-		* param_site.in					->  file containing the parameters of the site and of the inversion
-│   
-└─── Results						->  folder containing the results files
-										
-│   
-└─── src						->  folder containing the source files
-											
-
-```
  
 
 ### How to install the library RJ-McMC
@@ -89,12 +61,15 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 2. Configure the install file
 	for instance: 
     ```{r, engine='bash'}
-    ./configure --prefix=/Users/Jim/Documents/Work/Transdimensional/Modelscarp_RJ-McMC/RJMCMC-4/bin --with-openmpi-include-path /opt/local/include/openmpi-mp --with-openmpi-lib-path=/opt/local/lib/openmpi-mp
+    ./configure --prefix=/Users/Jim/RJMCMC/bin --with-openmpi-include-path /opt/local/include/openmpi-mp --with-openmpi-lib-path=/opt/local/lib/openmpi-mp
 
     ```
 	Options:
+	
 --prefix : specify the path of the bin folder where the RJ-McMC library will be installed.
+
 --with-openmpi-lib-path= specify the path of the “lib” folder of your mpi library.
+
 --with-openmpi-include-path= specify the path of “include” folder of your the mpi library.
 
 
@@ -111,7 +86,7 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
  
     ```{r, engine='bash'}
 	cd Modelscarp_Inversion
-	Export PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/export/home/RJMCMC/bin/lib/pkgconfig
+	Export PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/Users/Jim/RJMCMC/bin/lib/pkgconfig
     ```
    replace "/export/home/RJMCMC/bin/lib/pkgconfig" by your path
     
@@ -122,276 +97,144 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 	make rf_mpi
     ```
     F77= specify the mpi fortran compiler command (here it is "mpif90") 
+    
     FC= specify the mpi #C compiler command (here it is "mpif90") 
     
+ ### Structure of the Modelscarp_inversion directory
+ 
+```
+******** Content of the Modelscarp_inversion folder ******** 
 
 
-## How to desing and start an inversion ?
+|
+└─── Bin							->  folder containing the Modelscarp_inversion executable
+|
+└─── Data  							->  folder containing the data 
+
+		* data.txt					->  chemical composition of the samples from the fault-planes
+		* coll.txt					->  chemical composition of the colluvial wedge
+		* EL.txt					->  geomagnetic scaling factors over the time for fast neutrons and muons
+											
+│   
+└─── modelscarp_parameter					
+		* param_site.in					->  file containing the parameters of the site and of the inversion
+│   
+└─── Results						->  folder containing the results files
+										
+│   
+└─── src						->  folder containing the source files
+											
+
+```
+
+## How to start an inversion ?
 
 ### Searched parameters ?
-**Modelscarp Inversion** enables to search the exhumation history that best explain the <sup>36</sup>Cl concentration contained in the bedrock fault-plane. An exhumation history is determined by:
+**Modelscarp Inversion** enables to search the exhumation scenarios that best explain the <sup>36</sup>Cl concentration contained in the bedrock fault-plane. An exhumation history is determined by:
 
 -	The **inheritance history** determined by:
 	- the **long-term slip-rate** of the fault that make the samples rise toward the surface before the exhumation of the today observed fault-plane.
 	- a potential **quiescence period** of the fault that occurred just prior the exhumation of the today observed fault-plane.
 - The **post glacial exhumation history** of the fault-plane that usually includes a part of the fault-plane that has been sampled (the best preserved), and the top-most part of the fault-plane that has not been sampled because the fault-plane is too eroded. This history is parameterized by the **number of exhumation events**, their **ages**, and their **amplitude (slip)**.
 
-<mark>**Modelscarp Inversion** cannot search for the **number of events** since the this parameter has to be fixed for each inversion.</mark> In order to determine the number of events that can be resolved by the <sup>36</sup>Cl approach, **a series of several inversions** has to be achieved with an increasing number of events.
-
-### Inversion project 
-The interface enables to design two kinds of inversion project:
-
-- **Single inversion**: a project where a single inversion is operated with a fixed number of event.
-- **Multiple inversions**: a project where several inversions are operated with a varying number of event. For instance from 1 to 10 events. 
-
-You can **create a new inversion project** click on `Single inversion`, or  `Multiple inversion`.
-
-<img src="Tutorial/images/Modelscarp_inversion_Single_1.png" width="500">
-
-It also possible to **load an existing project**, in order to modify the parameter of the search by clicking on `Load an inversion project`.
-
-<img src="Tutorial/images/Modelscarp_inversion_existing.png" width="500">
-
 
 ### Create a new project Single inversion
-1. Start the assistant by clicking `Single inversion` on the Menu.
-2. Fill the parameters value for:
-	- the Neighbourhood Algorithm: configuration of the search algorithm.
-	- the site parameters: describe the geometry of the site, the density of the bedrock and of the colluvial wedge, and several parameters controlling the <sup>36</sup>Cl production in the samples.
-	- the parameters for the scenario of exhumation: the number of events, the parameters you want to search or fix, and the bounds of the search (the pre-exhumation slip-rate, potential quiescence period, age and slip of exhumation events).
+1. Prepare the data files in the “data” folder, (following the excel sheet `Format_your_data.xls`):
+	- data.txt : chemical data of the samples belonging to the bedrock fault-plane
+	- coll.txt : chemical composition of the colluvial wedge
+	- EL.txt : neutronic and muonic scaling factors covering the whole duration of the history (including the inheritance, e.g. 300 000 yr + 20 000 yr = 320 000 yr. The EL file must cover at least 320 000 yr).
 
-	<img src="Tutorial/images/Modelscarp_inversion_Single_2.png" width="500">
-3. Import the input files (previously prepared using the excel sheet `data.xls`):
-	- chemical data of the samples belonging to the bedrock fault-plane
-	- chemical composition of the colluvial wedge
-	- neutronic and muonic scaling factors covering the whole duration of the history (including the inheritance, for instance here 300 kyr).
-4. Provide a simple name for the inversion project, without symbols!
-5. At any time you can save the project to continue later.
-6. Generate the inversion files by clicking on `Generate parameter files`.
-A new folder for this project is created in the directory `Inversions`. This folder will contains:
+2. Edit the parameter file “modelscarp_param/param_site.in:
+    ```{r, engine='bash'}
+	####################################################
+	#  		PARAMETERS OF SITE
+	#			
+	####################################################
+	####################################################
+	#       Input data files parameters
+	####################################################
+	#### colluvium data file: coll.txt
+	1 : number of line
+	62 : number of column  ( ** do not change !)
+	#### fault-scarp data file: data.txt
+	101 : number of line
+	66 : number of column ( ** do not change !)
+	#### scaling factors file: sf.txt
+	5001 : number of line
+	4 : number of column  ( ** do not change !)
+	####################################################
+	#       Site Parameters
+	####################################################
+	800 : Total height of the scarp (cm)
+	200 : Maximum sample depth (cm below the colluvial wedge surface)
+	0.0 : Erosion rate (mm/yr)
+	#### Fault-scarp geometry
+	20 : alpha (colluvial wedge surface angle)
+	50 : beta (fault scarp surface angle)
+	30 : gamma (upper peri-glacial surface angle)
+	#### Density
+	2.00 : colluvium
+	2.70 : rock
+	####################################################
+	#       Elementary production rates
+	####################################################
+	42.2 : spallation rate in Ca
+	2.303e-06 : 	lambda_36 Radioactive decay constant for 36Cl (a-1)
+	208 : 	True attenuation length for fast neutron (g.cm-2)
+	####################################################
+	#       Inversion Parameters
+	####################################################
+	#### Slip-rate prior exhumation
+	y : search ? (y/n) if no, it is fixed with the minimum value
+	0.0 : min slip-rate (mm/yr)
+	5.0 : max slip-rate (mm/yr)
+	0.5 : Std dev. of slip-rate value change
+	#### Length of the long-term history prior the post-glacial exhumation
+	300000 : duration (yr)
+	#### Quiescence period
+	y : Include a quiescence period prior the exhumation of the scarp ? (y/n)
+	50000 : max age of the scarp top if quiescence is searched (yr)
+	2000.0 : Std dev. of scarp top age (yr)
+	#### Number of events
+	3 : Minimum number of events
+	20 : Maximum number of events
+	#### Event ages
+	0.0 : Min age
+	20000.0 : Max age
+	#### Algorithm search parameters
+	20.0 : Std dev. of move change (pd) (cm)
+	300.0 : Std dev. of age value changes (yr)
+	300.0 : Standart dev. of birth/death events (yr)
+	1200000 : number of iteration total
+	101 :	seed
+	983 : seed mult
 
-```
-******** Content of the Inversion folder ******** 
+    ```
+    
 
-│   
-└─── Inversions				->  folder containing all inversion projects 
-										
-		│   
-		└─── TEST					->  Folder of the project 'TEST' 
-												
-			│   
-			└─── bin					->  folder containing the executables 
-												"single inversion case"
-					- modelscarp_na		->  the inversion program
-					- envelop			->  program to determine the
-											uncertainties
-					- tmp_STOP			-> file to stop an on-going
-					 						inversion
-					- tmp_misfit		-> file to follow the evolution of
-											 the models and misfit during 
-											 an inversion
-			│   
-			└─── data					->  folder containing the data
-			│   
-			└─── modelscarp_param		->  folder containing the parameter 
-											files			
-			│   
-			└─── results				->  folder containing the results
-			
-					- na_results.txt	-> result file containing all 
-											models tested during the 
-											inversion with the associated 
-											misfit.
-				└─── SITE
-					- EQ_sequence.txt	-> final results with the best value 
-											found for each parameter and the 
-											associated uncertainties.
-					- models_in_envelope.txt -> file containing all the 
-												models included in the 
-												2 sigma uncertainty.	
-			│   
-			└─── src					->  folder containing the source 
-											files
-					- makena.macros		-> parameter file containing the 
-											compiler commands for the 
-											compilation
-												
-```
-### Run the inversion
-1. When he inversion files have been generated by clicking on `Generate parameter files`, a new window open. 
-
-	The left part of the window is dedicated to inversion itself: launching the inversion and following the live results (terminal output, and graph of the misfit evolution of tested models over iterations). 
-
-	The right part is dedicated to the plotting of the results after inversion has finished. 
+3. Prior the execution of the Modelscarp_Inversion program, specify in the terminal the path for the library of the RJ-McMC in the bin folder (bin/lib):
+    ```{r, engine='bash'}
+	cd Modelscarp_inversion
+	export LD_LIBRARY_PATH = $LD_LIBRARY_PATH:/Users/Jim/RJMCMC/bin/lib
+    ```
+4. Start the Modelscarp_Inversion program:
+    ```{r, engine='bash'}
+	./Modelscarp_inversion
+    ```
+5. On-going results for each chain of the inversion are placed in the folder 'results'.
+    ```{r, engine='bash'}
+	ChainNumber_results.txt
+    ```
+	e.g: for the chain 2, the result file is named: “2_results.txt”
 	
-	<img src="Tutorial/images/Modelscarp_inversion_Single_3.png" width="600">
-
-2. Start the inversion by clicking on `Start inversion`. This start the program *modelscarp_na*. At anytime, you can stop the inversion by clicking on `Stop inversion`. In that case the inversion will end at the end of the current iteration. This function is particularly interesting if you observe that the misfit has reach a low plateau and is stable, indicating that the best solution has been found. In that case it is not necessary to continue the inversion. 
-
-	<mark>**Important note:** It frequently appears that some tested models have very high misfit value (10E6). Those are models for which the sum of the slip events is larger than the fault-scarp height, thus impossible. For this reason they are directly discarded using a larger misfit value.</mark>
+	Each line of the file is a step of the chain (an accepted model). On a line you will find:
 	
-
-3. When inversion has finished, plot the results on the right panel by clicking on `Plot results`. The cumulative slip over the time for each tested model is plotted. The color represent the misfit of the model. The green curve represent the best model. 
-
-	It is also possible to plot the modeled 36Cl profile by clicking on `Plot 36Cl profile`.
-
-	Additional plots can be obtained with `Plot detailed results`.
-
-4. Determine uncertainties associated with the best model by clicking `Determine uncertainties`. This starts the program *envelop* that can take a certain time. The evolution can be followed in the terminal output. When uncertainties are determined, it is possible to plot the cumulative slip over the time of the models included within the analytical uncertainty. 
-
-5. Results from an inversion can also be plotted latter by clicking `Plot results` of the main menu.
-
-### Create a new project of Multiple inversion
-In that case, the project will be composed of several inversion with a number of events varying between a minimum and maximum value that you determine.
-
-1. Start the assistant by clicking `Multiple inversion` on the Menu.
-
-2. Similarly to the single inversion, fill the different parameters. 
+	Number of events, Slip-rate (mm/yr) Quiescence period length (kyr, if searched), event ages, event slips, rmsw.
 	
-	<img src="Tutorial/images/Modelscarp_inversion_mult_1.png" width="600"> 
-	
-	For the exhumation scenario, provide the minimum and the maximum number of events that you want to test. For instance if you choose a minimum of 1 and a maximum of 3 events, the interface will create 3 different inversions, one with a single exhumation event (called *1ev*), a second with 2 events (called *2ev*), and a third with 3 events...
+	e.g: the following model is composed of 2 events at 8291 and 9047 yr with a slip of 997 and 602 cm, a peri-glacial slip-rate of 3.52 mm/yr and no quiescence period.
+	    ```{r, engine='bash'}
+		 2, 3.52, 8291 9047, 997.253505 602.746495, 333.78
+    	    ```
+	    
+6. When the inversion end, results of each chain are avalaible in the folder 'results'. 
 
-	In that case, 3 folders are created in the inversion directory : *1ev*, *2ev*, and *3ev*, each containing the executables for the inversion. See the example below:
-	
-	
-	```
-******** Content of the Inversion folder ********    
-└─── Inversions		->  folder containing all inversion projects 
-										
-		│   
-		└─── TEST		->  Folder of the multi-inversion project 'TEST' 
-			│   
-			└─── 1ev				-> folder containing the executables    
-				└─── bin				for the inversion using 1 event
-				└─── data	   
-				└─── modelscarp_param   
-				└─── results	   
-				└─── src					
-			│   
-			└─── 2ev				-> folder containing the executables    
-				└─── bin				for the inversion using 2 events
-				└─── data	   
-				└─── modelscarp_param   
-				└─── results	   
-				└─── src	
-			│   
-			└─── 3ev				-> folder containing the executables    
-				└─── bin				for the inversion using 3 events
-				└─── data	   
-				└─── modelscarp_param   
-				└─── results	   
-				└─── src	
-				
-	```
-3. `Generate parameter files for the inversions` create those inversion folders and start the assistant to run the inversion and plot the live results. 
-
-4. Because the inversion can take a long time on a single computer, it is recommended to run the multiple inversions out of Matlab. The Matlab graphical interface will enable you to follow the results. 
-
-	To run an inversion:
-	
-   1. open a terminal (out of Matlab)
-
-   2. Go to the inversion directory. For instance for the 1 event inversion:
-
-		```	
-		cd Modelscarp_V2/Inversions/TEST/1ev/bin
-		```
-		
-   3. Start the inversion with the following command:
-		
-		```	
- 		./modelscarp
- 		```	
- 		
-5. Because the inversion can take a long time on a single computer, it is recommended to run the multiple inversions out of Matlab. The Matlab graphical interface will enable you to follow the results by clicking on `Live results`, or on `Plot results (on-going or finished inversion)` on the initial menu.
-
-	<img src="Tutorial/images/Modelscarp_inversion_mult_2.png" width="300"><img src="Tutorial/images/Modelscarp_inversion_mult_3.png" width="200">
-
-6. This interface enables you to follow the progress of each inversion that you have previously started, by selecting which inversion is followed on the left panel.
-
-	<img src="Tutorial/images/Modelscarp_inversion_mult_4.png" width="500">
-	
-	-> When an inversion has finished, the results can be plotted on the right panel (cumulative slip over the time of each tested model, the color of the curve varies as function of the misfit of the model)
-
-    <img src="Tutorial/images/Modelscarp_inversion_mult_5.png" width="500">
-
-	-> Detailed results can be plotted showing for each tested models, the age and the slip of the events and the associated misfit (RMSw).
-
-	<img src="Tutorial/images/Modelscarp_inversion_mult_6.png" width="500">
-	
-7. Once an inversion has finished, you need to run the program ```envelop```  in the terminal (not in Matlab) to find all the models included within the analytical uncertainty and determine the uncertainties on the exhumation scenario. 
-
-	-> The cumulative slip of all those models are figured by the light green curves, and the best model in dark green.
-
-	<img src="Tutorial/images/Modelscarp_inversion_mult_7.png" width="500">
-		
-	-> It is possible to plot the <sup>36</sup>Cl profile of the best model (red dots), compared with the data (black dots), as shown by the following figure:	
-
-	<img src="Tutorial/images/Modelscarp_inversion_mult_8.png" width="300">
-	
-8. When all inversions have finished, it is possible to plot the RMSw of the best models has function of the number of events (as shown in the following figure):
-
-	<img src="Tutorial/images/Modelscarp_inversion_mult_9.png" width="300">
-
-9. It is also possible to plot the cumulative slip of the final scenario inferred from each inversion with a varying number of events:	
-
-	<img src="Tutorial/images/Modelscarp_inversion_mult_10.png" width="400">
-	
-## How to run modelscarp on a cluster ?
-
-It is better to run inversion on a cluster because usually a large number of iterations are required to converge and well explore the parameter space. 
-
-### Design the inversion project
-1. Similarly to the previous example, you need to create a `multiple inversion` project. In that case, **you had to specify that the inversion will be operated on a cluster** by clicking on `cluster`. Then generate the parameter files for the inversions.
-
-	<img src="Tutorial/images/Modelscarp_inversion_cluster.png" width="400">
-
-2. **Copy the folder of the inversions on the cluster.**
-3. **The executables of each inversion have to be compiled on the cluster** by running those commands in the terminal of your cluster, located in the directory of the inversion project.
-	
-	For instance:
-
-	1. Connection from my computer to the cluster with the terminal:
-
-		```	
-		ssh yourcluster.com -l login
-		```
-	
-	2. Go to the directory of the inversion project called "TEST":
-
-		```	
-		cd your_path_to_modelscarp/Inversions/TEST
-		```
-	
-	3. Give the right to execute the script:
-
-		```	
-		chmod u+rwx compile_all.sh
-		```
-	
-	4. Execute the script of compilation:
-
-		```	
-		./compile_all.sh
-		```
-		wait for one or two minutes...
-		
-4. **Start each inversion using the appropriated command of your cluster.** For instance for the 1 event inversion, the script may contain those commands:
-
-	```	
-	% go to the binaries folder of the 1 event inversion
-	cd your_path_to_modelscarp/Inversions/TEST/1ev/bin
-	
-	% run the inversion program
-	./modelscarp_na	
-	
-	% run the program to determine the uncertainties
-	./envelop
-	```
-4. **At any time you can follow the evolution of an inversion** by downloading the inversion folder on your computer, and using the Matlab interface `Plot results (on-going or finished inversion)` (in  the first menu). 
-	In that case, the file `tmp_misfit`in the `bin` directory will be used to follow the evolution of the misfit over the iteration. 
-	
-	<img src="Tutorial/images/Modelscarp_inversion_mult_5.png" width="400">
-	
-	___
