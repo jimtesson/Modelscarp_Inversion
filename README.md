@@ -76,19 +76,18 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 
 3. Install the RJ-McMC library : 
     ```{r, engine='bash'}
-	make clean
-	make
-	make install
+    make clean
+    make
+    make install
     ```
 
 ###  Installation of the program Modelscarp Inversion
 
 1.Specify the "pkgconfig" path localized in the directory of RJMCMC (bin/lib/pkconfig) 
- 
-    ```{r, engine='bash'}
+```{r, engine='bash'}
 	cd Modelscarp_Inversion
-	Export PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/Users/Jim/RJMCMC/bin/lib/pkgconfig
-    ```
+	export PKG_CONFIG_PATH = $PKG_CONFIG_PATH:/Users/Jim/RJMCMC/bin/lib/pkgconfig
+```    
    replace "/Users/Jim/RJMCMC/bin/lib/pkgconfig" by your path
     
 2. Configure the install file
@@ -182,6 +181,8 @@ The RJ-McMC library is provided in the folder RJMCMC. The installation is operat
 	42.2 : spallation rate in Ca
 	2.303e-06 : 	lambda_36 Radioactive decay constant for 36Cl (a-1)
 	208 : 	True attenuation length for fast neutron (g.cm-2)
+	exp : model used to scale muonic production ('lsd' or 'exp')
+	1500 : Lambda muon, if muonic is 'exp'
 	####################################################
 	#       Inversion Parameters
 	####################################################
