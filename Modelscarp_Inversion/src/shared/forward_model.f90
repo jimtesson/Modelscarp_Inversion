@@ -97,7 +97,7 @@ real, dimension(:), allocatable :: Nef
 real (kind = c_double), dimension(FM_NPARAMETERS) :: values
 
 
-integer :: i, j ,nb_event
+integer :: i, j ,nb_event, n_z_muon
 
 real :: likelihood
 
@@ -180,6 +180,10 @@ nb_event = j
 
 preexp = data_pointer%param_inv_preexp
 
+! number of point of the muon depth vector 
+n_z_muon = size(data_pointer%depthvector)
+
+! call the forward model
 call forward_modelscarp(sr,age,slip,preexp,&
 nb_event,likelihood,&
 data_pointer%nl_data,data_pointer%nc_data,&
@@ -190,6 +194,10 @@ data_pointer%EL_ti,data_pointer%EL_it,data_pointer%EL_f,data_pointer%EL_mu,&
 data_pointer%Zs,data_pointer%S_s,&
 data_pointer%so_f_beta_inf,data_pointer%Lambda_f_beta_inf,&
 data_pointer%so_f_e,data_pointer%Lambda_f_e,&
+data_pointer%mu_model,data_pointer%Lambda_mu,&
+n_z_muon,&
+data_pointer%flux_muon_R,data_pointer%flux_muon_phi,&
+data_pointer%muon36,data_pointer%muon36_coll,&
 height_depth,height_data,cl36AMS,sig_cl36AMS,Nef)
 
 

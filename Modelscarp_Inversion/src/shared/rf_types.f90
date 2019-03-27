@@ -107,6 +107,81 @@ module rf_types
         real*4 Lambda_f_beta_inf
         real*4 so_f_e
         real*4 Lambda_f_e
+        real*4 Lambda_mu
+        character (len=3) mu_model
+        real*4 Param_site_lat
+        real*4 Param_site_alt
+!   LSD
+        real*4 LSD_M(2383)
+        real*4 LSD_t_M(2383)
+        real*4 t_fineRc(76)
+        real*4 lat_Rc(37)
+        real*4 lon_Rc(25)
+        real*4 t_Rc(45)
+        real*4 MM0_KCL(76)
+        real*4 lat_pp_KCL(76)
+        real*4 lon_pp_KCL(76)
+        real*4 S(120)
+        real*4 SInf
+        real*4 SPhiInf
+        real*4 SPhi(120)
+        real*4 O16nxBe10(200)
+        real*4 O16pxBe10(200)
+        real*4 SinxBe10(200)
+        real*4 SipxBe10(200)
+        real*4 O16nn2pC14(200)
+        real*4 O16pxC14(200)
+        real*4 SinxC14(200)
+        real*4 SipxC14(200)
+        real*4 Aln2nAl26(200)
+        real*4 AlppnAl26(200)
+        real*4 SinxAl26(200)
+        real*4 SipxAl26(200)
+        real*4 KnxCl36(200)
+        real*4 KpxCl36(200)
+        real*4 CanapCl36(200)
+        real*4 CapxCl36(200)
+        real*4 FenxCl36(200)
+        real*4 FepxCl36(200)
+        real*4 TinxCl36(200)
+        real*4 TipxCl36(200)
+        real*4 MgnxNe21(200)
+        real*4 MgpxNe21(200)
+        real*4 AlnxNe21(200)
+        real*4 AlpxNe21(200)
+        real*4 SinxNe21(200)
+        real*4 SipxNe21(200)
+        real*4 OnxHe3T(200)
+        real*4 OpxHe3T(200)
+        real*4 SinxHe3T(200)
+        real*4 SipxHe3T(200)
+        real*4 AlnxHe3T(200)
+        real*4 AlpxHe3T(200)
+        real*4 MgnxHe3T(200)
+        real*4 MgpxHe3T(200)
+        real*4 CanxHe3T(200)
+        real*4 CapxHe3T(200)
+        real*4 FenxHe3T(200)
+        real*4 FepxHe3T(200)
+        real*4 Natoms3
+        real*4 Natoms10
+        real*4 Natoms14
+        real*4 Natoms26
+        real*4 M_old(2383)
+        real*4 Natoms36Ti
+        real*4 Natoms36Fe
+        real*4 Natoms36Ca
+        real*4 Natoms36K
+        real*4 dd(6)
+        real*4 LSD_maxdepth
+        real, dimension(:), allocatable :: depthvector
+        real*4 Pressure
+        real, dimension(:), allocatable :: flux_muon
+        real*4 RcEst 
+        real, dimension(:),allocatable :: flux_muon_R,flux_muon_phi
+        real, dimension(:,:,:),allocatable :: muon36
+        real, dimension(:,:,:),allocatable :: muon36_coll
+
 
   end type rfdata_t
 

@@ -58,14 +58,15 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	real*4 so_f_e,Lambda_f_e
 	real*4 m
 	real*4 dphi,dtheta
-
+        real*4 Lambda_mu
+        character (len=3) mu_model
 	
 	common /C1/ pi,alpha,beta,gama
 	common /C2/ rho_coll,rho_rock
 	common /C3/ Psi_Cl36_Ca_0,lambda_36,lambda
 	common /C4/ Hfinal,N_eq
 
-        write(*,*)"Hfinal",Hfinal
+        !write(*,*)"Hfinal",Hfinal
 
 !Meshgrid
 	do i=1,181

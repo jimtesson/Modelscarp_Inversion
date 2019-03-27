@@ -69,7 +69,11 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !
 !--------------------------------------------------------------------------
         subroutine clcoll(P_cosmo,coll
-     & ,sample,Lambda_f,so_f,EL_f,EL_mu)
+     & ,sample,Lambda_f,so_f,EL_f,EL_mu,
+     &  mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36)
 
 
 	implicit none
@@ -77,13 +81,16 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	common /C3/ Psi_Cl36_Ca_0,lambda_36,lambda
 	common /C5/ nl_coll,nl_data,nl_EL,nc_coll,nc_data,nc_El
 
-
-
 ! Common variables
 	real*4 lambda,lambda_inv
 	real*4 rho_coll,rho_rock
 	real*4 Psi_Cl36_Ca_0,lambda_36
 	integer nl_coll,nl_data,nl_EL,nc_coll,nc_data,nc_El
+        real*4 Lambda_mu
+        character (len=3) mu_model
+        integer n_z_muon
+        real*4 flux_muon_R(n_z_muon),flux_muon_phi(n_z_muon)
+        real*4 muon36(n_z_muon,8)
 ! Transfered variables
 	real*4 P_cosmo
 	real*4 sample(nc_data)
@@ -97,10 +104,8 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	real*4 chimie(nc_data-4)
 	real*4 z
 	real*4 ppm(nc_data-4)
-	real*4 thick
 	real*4 th2
 	real*4 so_mu
-	real*4 Lambda_mu
 	real*4 A_k(61)
 	real*4 ppmc(62)
 	real*4 Num_k(61)
@@ -174,6 +179,17 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	real*4 P,P_sp_sc,P_mu_sc
 	real*4 P_th_sc,P_eth_sc
 	real*4 P_cosmo_2
+       integer ndepths,i
+        real*4 depths(10)
+        real*4 thick
+        real*4 deltadepth
+        real*4 top_depth
+        real*4 yout(10)
+        real*4 negfluxdepth
+        real*4 totalfluxdepth
+        real*4 P_mu_depth
+        real*4 R_mu_depth
+        real*4 R_prime_mu_depth
 
 !-----------------------------------------------------------------	
 	n=nc_data
@@ -182,8 +198,6 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	z=sample(n-3) 
 	thick=sample(n-2)
 	th2=thick/2
-
-	
 
 ! Muons coefficients :
 	so_mu = so_f
@@ -362,6 +376,21 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	N_k(56) = N_k(56)/rho_rock ! divided by bulk-rock density according to CHLOE for H
 	N_kc(56) = N_kc(56)/rho_coll ! divided by bulk-rock density according to CHLOE for H
 
+! Variable to compute the thickness integration factor 
+        ndepths = 10
+        thick = sample(64)
+        deltadepth = thick/ndepths
+        if(z==.0) then
+            top_depth = z
+        else
+            top_depth = z-thick/2
+        endif
+
+        do i=1,ndepths
+            depths(i)=top_depth+deltadepth/2+deltadepth*(i-1)
+        enddo
+            WHERE(depths.LT..0) depths = .0 ! avoid negative values
+        
 ! ------------------- PRODUCTION RATES ----------------------------
 ! ------------------- Spallation ------------------------------------ 
 
@@ -389,8 +418,15 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	C_Fe = ppm(46)*1e-6 ! Mass concentration of Fe (g of Fe per g of rock)
 	P_sp_Fe = Psi_Cl36_Fe_0*C_Fe ! result unscaled 36Cl production by spallation of Fe (atoms 36Cl g-1 yr-1)
 
-	P_sp = (P_sp_Ca + P_sp_K + P_sp_Ti + P_sp_Fe)
+        if(mu_model == 'exp'.OR.mu_model == 'EXP') then
+	    P_sp = (P_sp_Ca + P_sp_K + P_sp_Ti + P_sp_Fe)
      &         *exp(-z/Lambda_f)
+        else if(mu_model == 'lsd'.OR.mu_model == 'LSD') then
+        P_sp = (P_sp_Ca + P_sp_K + P_sp_Ti + P_sp_Fe)
+     &         *exp(-z/Lambda_f)
+        P_sp = SUM((P_sp_Ca + P_sp_K + P_sp_Ti + P_sp_Fe)
+     &         *exp(-depths/Lambda_f))/10
+        endif
 
 ! -------------------- Direct capture of slow negative muons ---------------------
 ! -------------------- by target elements Ca and K ------------------------------- 
@@ -417,9 +453,34 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	Y_Sigma = Y_Sigma_Ca + Y_Sigma_K ;
 
 	Psi_mu_0 = 190 ! slow negative muon stopping rate at land surface (muon/g/an), Heisinger et al. (2002)
+
+        if(mu_model == 'exp'.OR.mu_model == 'EXP') then
 	P_mu = Y_Sigma*Psi_mu_0*exp(-z/Lambda_mu) ! Unscaled slow negative muon production rate (atoms 36Cl g-1 yr-1)
+        else if(mu_model == 'lsd'.OR.mu_model == 'LSD') then
+        	negfluxdepth = .0
+        	totalfluxdepth = .0
+        	P_mu = .0
+        	if(maxval(depths).lt.maxval(muon36(:,1))) then
+            ! negative muon flux
+            call interpolate_fun(muon36(:,1),
+     &                 flux_muon_R,n_z_muon,depths,
+     &                  yout,ndepths)
+            negfluxdepth = sum(yout)/ndepths
 
+            ! total muon flux
+            call interpolate_fun(muon36(:,1),
+     &                 flux_muon_phi,n_z_muon,depths,
+     &                  yout,ndepths)
+            totalfluxdepth = sum(yout)/ndepths
 
+              ! Muon production rate
+            call interpolate_fun(muon36(:,1),
+     &                 muon36(:,8),n_z_muon,depths,
+     &                  yout,ndepths)
+            P_mu = sum(yout)/ndepths  
+            endif
+        endif
+	
 
 ! ------------------------------------ Epithermal neutrons ------------------------------------ 
 
@@ -510,13 +571,28 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      &                /((D_eth_a/L_eth_a) + (D_eth/L_eth))  ! EQ. 3.28 Gosse & Phillips, 2001
 	!Difference between phi_star_eth,ss and actual epithermal neutron flux at land surface
 
-	phi_eth_total = phi_star_eth*exp(-z/Lambda_f) + 
+       if(mu_model == 'exp'.OR.mu_model == 'EXP') then
+        R_mu = EL_mu*P_n_mu_0/(EL_f*P_f_0*R_eth) !Ratio of muon production rate to epithermal neutron production rate
+	    phi_eth_total = phi_star_eth*exp(-z/Lambda_f) + 
      &    (1 + R_mu*R_eth)*FDeltaphi_star_eth*exp(-z/L_eth) +
      &     R_mu*phi_star_eth*exp(-z/Lambda_mu) !Epithermal neutron flux (concentration) (n cm-2 yr-1)
+        else if(mu_model == 'lsd'.OR.mu_model == 'LSD') then
+        !depth dependent variables for muon-produced neutrons
+        P_mu_depth=Y_Sigma*negfluxdepth+0.0000058*totalfluxdepth
+        R_mu_depth=P_mu_depth/(EL_f*P_f_0*R_eth)
 
+        !depth independent variables for muon-produced neutrons
+        R_mu=P_mu/(EL_f*P_f_0*R_eth)
+        ! % Epithermal neutron flux (concentration) (n cm-2 yr-1)
+        phi_eth_total = SUM((phi_star_eth * exp(-depths/Lambda_f) +
+     &  (1 + R_mu * R_eth) * FDeltaphi_star_eth * exp(-depths/L_eth) + 
+     &        R_mu_depth * phi_star_eth))/ndepths
+        endif
+
+        
 	P_eth = (f_eth/Lambda_eth)*phi_eth_total*(1 - p_E_th)
-	if(P_eth==0.0) P_eth=1E-30
 
+	if(P_eth==0.0) P_eth=1E-30
 	A_eth = phi_star_eth 
 	A_eth = A_eth*(f_eth/Lambda_eth)*(1 - p_E_th)
 	B_eth = (1 + R_mu*R_eth)*FDeltaphi_star_eth
@@ -575,13 +651,30 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      &    - JDeltaphi_star_eth))
      & /((D_th/L_th) + (D_th_a/L_th_a)) ! portion of difference between phi_star_th,ss and actual flux due to thermal flux profile
 
-	phi_th_total = phi_star_th*exp(-z/Lambda_f) 
+
+
+       if(mu_model == 'exp'.OR.mu_model == 'EXP') then
+
+        R_prime_mu = (p_E_th_a/p_E_th)*R_mu ! ratio of muon production rate to thermal neutron production rate
+	    phi_th_total = phi_star_th*exp(-z/Lambda_f) 
      &   + (1 + R_prime_mu)*JDeltaphi_star_eth*exp(-z/L_eth) 
      &   + (1 + R_prime_mu*R_th)*JDeltaphi_star_th*exp(-z/L_th)
      &   + R_prime_mu*phi_star_th*exp(-z/Lambda_mu) ! Thermal neutron flux (n.cm_2.a-1)
 
-	P_th = (f_th/Lambda_th)*phi_th_total ! Result unscaled sample specific 36Cl production rate by capture of thermal neutrons (atoms 36Cl g-1 yr-1)
+        else if(mu_model == 'lsd'.OR.mu_model == 'LSD') then
 
+        R_prime_mu=R_mu*(p_E_th_a/p_E_th)
+        R_prime_mu_depth=R_mu_depth*(p_E_th_a/p_E_th)
+        ! Thermal neutron flux (n.cm_2.a-1)
+        phi_th_total = SUM(phi_star_th*exp(-depths/Lambda_f) +
+     &      (1 + R_prime_mu)*JDeltaphi_star_eth*exp(-depths/L_eth) +
+     &      (1 + R_prime_mu*R_th)*JDeltaphi_star_th*exp(-depths/L_th) +
+     &      R_prime_mu_depth*phi_star_th) /ndepths
+        
+        endif
+
+
+	P_th = (f_th/Lambda_th)*phi_th_total ! Result unscaled sample specific 36Cl production rate by capture of thermal neutrons (atoms 36Cl g-1 yr-1)
 		if(P_th.eq.0) P_th=1E-30
 
 	A_th = phi_star_th
@@ -597,6 +690,7 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 ! ------------------------------------ Sample thickness factors -----------------------------------------
+        if(mu_model == 'exp'.OR.mu_model == 'EXP') then
 !           Sample thickness factors as a function of sample position along direction e.
 	! For spallation
 	Q_sp = 1 + (th2**2/(6*(Lambda_f**2)))
@@ -642,6 +736,20 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      &      + S_L_eth*Q_eth*P_eth) + so_mu*EL_mu*Q_mu*P_mu
      
 	     !write(*,*)"P_cosmo",P_cosmo,Q_eth,P_eth,Q_th,P_th
+
+        else if(mu_model == 'lsd'.OR.mu_model == 'LSD') then
+
+        S_L_th = 1 ! % diffusion out of objects (poorly constrained)
+        S_L_eth = 1 ! % diffusion out of objects (poorly constrained)
+
+        P_cosmo = so_f*EL_f*(P_sp + S_L_th*P_th + S_L_eth*P_eth) + P_mu
+        P_sp_sc = so_f*EL_f*P_sp
+        P_mu_sc = P_mu
+        P_th_sc = so_f*EL_f*S_L_th*P_th
+        P_eth_sc = so_f*EL_f*S_L_eth*P_eth
+
+        endif
+
 	return
 
 	end

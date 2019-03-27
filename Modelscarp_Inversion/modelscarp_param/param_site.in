@@ -17,7 +17,10 @@
 ####################################################
 #       Site Parameters
 ####################################################
-800 : Total height of the scarp (cm)
+42.12400 : Latitude (decimal degree, ex: 42.12400)
+1255 : Altitude (decimal degree, ex: 1255)
+####
+1600 : Total height of the scarp (cm)
 200 : Maximum sample depth (cm below the colluvial wedge surface)
 0.0 : Erosion rate (mm/yr)
 #### Fault-scarp geometry
@@ -33,6 +36,8 @@
 42.2 : spallation rate in Ca
 2.303e-06 : 	lambda_36 Radioactive decay constant for 36Cl (a-1)
 208 : 	True attenuation length for fast neutron (g.cm-2)
+exp : model used to scale muonic production ('lsd' or 'exp')
+1500 : Lambda muon, if muonic is 'exp' 
 ####################################################
 #       Inversion Parameters
 ####################################################
@@ -44,11 +49,11 @@ y : search ? (y/n) if no, it is fixed with the minimum value
 #### Length of the long-term history prior the post-glacial exhumation
 300000 : duration (yr)
 #### Quiescence period
-y : Include a quiescence period prior the exhumation of the scarp ? (y/n)
+n : Include a quiescence period prior the exhumation of the scarp ? (y/n)
 50000 : max age of the scarp top if quiescence is searched (yr)
 2000.0 : Std dev. of scarp top age (yr)
 #### Number of events
-3 : Minimum number of events
+1 : Minimum number of events
 20 : Maximum number of events
 #### Event ages
 0.0 : Min age

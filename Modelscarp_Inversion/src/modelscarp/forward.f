@@ -40,6 +40,10 @@ c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      &      Zs,S_s,
      &      so_f_beta_inf,Lambda_f_beta_inf,
      &      so_f_e,Lambda_f_e,
+     &      mu_model,Lambda_mu,
+     &      n_z_muon,
+     &      flux_muon_R,flux_muon_phi,
+     &      muon36,muon36_coll,
      &      total_slip,
      & 		hauteur,cl36AMS,sig_cl36AMS,Nef)
 
@@ -60,10 +64,16 @@ c --------------VARIABLE and PARAMETER DECLARATION
 
 ! datafiles variables
 !	real*4 model(nb_event+1)
-	integer nb_event
+	integer nb_event,n_z_muon
 	integer nl_coll,nl_data,nl_EL,nc_coll,nc_data,nc_El
 	integer l_coll,l_data,l_EL,c_coll,c_data,c_El
 	integer chrono
+!----variables for muon stuff
+        real*4 Lambda_mu
+        character (len=3) mu_model
+        real*4 flux_muon_R(n_z_muon),flux_muon_phi(n_z_muon)
+        real*4 muon36(nl_data,n_z_muon,8)
+        real*4 muon36_coll(1,n_z_muon,1)
 !----variables of read data part
 	real*4 rock_data(nl_data,nc_data)
 	real*4 EL_data(nl_EL,nc_EL)
@@ -169,41 +179,41 @@ c --------------VARIABLE and PARAMETER DECLARATION
         real*4 tmp(nb_event)
 
 !------INITIALIZATION
-        
-
+ 
         N_eq = nb_event
-        Hfinal = int(total_slip)+2
+        Hfinal = int(total_slip)
 
         tmp = age(nb_event:1:-1)
         age = tmp
         tmp = slip(nb_event:1:-1)
         slip = tmp
 		preexp=inheritance
-!        write(*,*)nb_event
-!        write(*,*)age
-!        write(*,*)slip
-!        write(*,*)SR2
-!        age(1) = 18000
-!        age(2) = 16000
-!        age(3) = 14000
-!        age(4) = 12000
-!        age(5) = 10000
-!        age(6) = 7000
-!        age(7) = 4000
-!        age(8) = 1000
-!        age(9) = 0
+        !write(*,*)nb_event
+        !write(*,*)age
+        !write(*,*)slip
+        !write(*,*)SR2
+        !age(1) = 16500
+        !age(2) = 16000
+        !age(3) = 15500
+        !age(4) = 15000
+        !age(5) = 2500
+        !age(6) = 2000
+        !age(7) = 1500
+        !age(8) = 1000
+        !age(9) = 0
+        !age(10) = 0
 
- !       slip(1) = 200
- !       slip(2) = 200
- !       slip(3) = 200
- !       slip(4) = 200
- !       slip(5) = 200
- !       slip(6) = 200
- !       slip(7) = 200
- !       slip(8) = 200
- !       slip(9) = 200
-
-!            SR2 = 1.0
+        !slip(1) = 200
+        !slip(2) = 200
+        !slip(3) = 200
+        !slip(4) = 200
+        !slip(5) = 200
+        !slip(6) = 200
+        !slip(7) = 200
+        !slip(8) = 200
+        !slip(9) = 200
+        !slip(10) = 0
+        !    SR2 = 1.0
 
         !write(*,*)nb_event
         !write(*,*)age
@@ -274,7 +284,7 @@ c --------------VARIABLE and PARAMETER DECLARATION
 !------ in order to avoid R > Hfinal due to small appriximation
 
         if(R.gt.Hfinal) then
-            write(*,*)"R gt Hfinal"
+            write(*,*)"R gt Hfinal",R,Hfinal
 !            slip(nb_event) = slip(nb_event)
 !     &      - R + Hfinal
 
@@ -297,10 +307,12 @@ c --------------VARIABLE and PARAMETER DECLARATION
 !------initial height of the scarp during pre-exposure
 	Hinit = Hfinal - R
 
-
 !-----------------------------------------------------------	
 !-------------SURFACE SCALING-------------------------------
 !-----------------------------------------------------------
+!--- To speed up, the SURFACE SCALING part is now calculated 
+!--- in the initialization of data, not in the forward routine !!!!
+
 !               using scsurf.o for z>=0
 ! Calculates a scaling factor S_S(z>=0) every cm used for the samples at  
 ! surface which is normalized by S_S(z=0) after in the calculation of production 
@@ -353,8 +365,9 @@ c--------------------------------------------------------------------------
 ! h must be in cm and integers
 	
 	h = int(rock_data(:,nc_data-3)) ! initial positions of the samples at surface (cm)- integer
+
 	Z = (Hfinal - rock_data(:,nc_data-3))*rho_coll ! initial depth of the samples (g.cm-2)	
-	
+
 	d=rock_data ! substitution of matrix data by matrix d
 	d(:,n-3) = Z !samples position along z
 	d(:,n-2) = rock_data(:,n-2)*rho_rock !thickness converted in g.cm-2
@@ -429,9 +442,9 @@ c Calculation of [36Cl] concentration profile at the end of pre-exposure.
      &           *sin( (beta_r-alpha_r))
      &		+ start_depth*sin(beta_r-alpha_r)
      &      *rho_coll ! modified by TESSON 2015 to integrate the peri-glacial slip-rate
+
 		d0=dpj
 		d0(nc_data-3)=0
-	
 
 		N_in = No(j) ! initial concentration (here = zero)
 
@@ -442,29 +455,42 @@ c Calculation of [36Cl] concentration profile at the end of pre-exposure.
         if(ii.eq.1) then
             call clrock(P_cosmo,P_rad,
      &   d(j,:),eo(j),Lambda_f_e,so_f_e,EL_f(tt(ii)),
-     &   EL_mu(tt(ii)))
+     &   EL_mu(tt(ii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36(j,:,:))
+
             call clcoll(P_zero,coll_data(1,:),
      &   d0,Lambda_f_beta_inf,so_f_beta_inf,EL_f(tt(ii)),
-     &   EL_mu(tt(ii)))
-
+     &   EL_mu(tt(ii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36_coll(1,:,:))
         else
 
             if(((EL_f(tt(ii)).ne.EL_f(tt(ii-1)))).AND.
      &  (EL_mu(tt(ii)).ne.EL_mu(tt(ii-1)))) then
             call clrock(P_cosmo,P_rad,
      &   d(j,:),eo(j),Lambda_f_e,so_f_e,EL_f(tt(ii)),
-     &   EL_mu(tt(ii)))
+     &   EL_mu(tt(ii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36(j,:,:))
             call clcoll(P_zero,coll_data(1,:),
      &   d0,Lambda_f_beta_inf,so_f_beta_inf,EL_f(tt(ii)),
-     &   EL_mu(tt(ii)))
+     &   EL_mu(tt(ii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36_coll(1,:,:))
             endif
             
         endif
 			 call clcoll(P_coll,coll_data(1,:),
      &   dpj,Lambda_f_diseg(1),so_f_diseg(1),EL_f(tt(ii)),
-     &   EL_mu(tt(ii)))
-!        endif
-
+     &   EL_mu(tt(ii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36_coll(1,:,:))
 
 		scoll=P_coll/P_zero
 		P_tot = P_rad + P_cosmo*scoll ! only P (Pcosmogenic) is scalled by scoll
@@ -564,7 +590,10 @@ c C1 - Loop - iteration on samples (k) from first exhumed segment
         else
 			call clrock(P_cosmo,P_rad,
      &   djk,ejk,Lambda_f_e,so_f_e,EL_f(tt(ii)),
-     &   EL_mu(tt(ii)))
+     &   EL_mu(tt(ii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36(j1(k),:,:))
         endif
 
 
@@ -664,18 +693,27 @@ c			write(*,*)'k,j2(k),ANi',k,j2(k),ANi(j2(k))
                     else
 				call clrock(P_cosmo,P_rad,
      &   djk,ejk,Lambda_f_e,so_f_e,EL_f(ttt(iii)),
-     &   EL_mu(ttt(iii)))
+     &   EL_mu(ttt(iii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36(j2(k),:,:))
 
 				call clcoll(P_zero,coll_data(1,:),
      &   d0,Lambda_f_beta_inf,so_f_beta_inf,EL_f(ttt(iii)),
-     &   EL_mu(ttt(iii)))
+     &   EL_mu(ttt(iii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36_coll(1,:,:))
 
                 endif
 
 
 				 call clcoll(P_coll,coll_data(1,:),
      &   djk,Lambda_f_diseg(l+1),so_f_diseg(l+1),EL_f(ttt(iii)),
-     &   EL_mu(ttt(iii)))
+     &   EL_mu(ttt(iii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36_coll(1,:,:))
 
 				scoll = P_coll/P_zero
 				P_tot = P_rad + P_cosmo*scoll ! only P (Pcosmogenic) is scalled by scoll
@@ -721,7 +759,10 @@ c			write(*,*)'k,j2(k),ANi',k,j2(k),ANi(j2(k))
                 else
 				call clrock(P_cosmo,P_rad,
      &   djk,ejk,Lambda_f_e,so_f_e,EL_f(tt(ii)),
-     &   EL_mu(tt(ii)))
+     &   EL_mu(tt(ii)),mu_model,Lambda_mu,
+     &   n_z_muon,
+     &   flux_muon_R,flux_muon_phi,
+     &   muon36(j2(k),:,:))
 
                 endif
 				!surface scaling factor (scorr)
@@ -804,17 +845,17 @@ c			write(*,*)'k,j2(k),ANi',k,j2(k),ANi(j2(k))
 	endif
 
 !	close(20)
-       ! write(*,*)
-       ! write(*,*)'sr',SR2
-       ! write(*,*)'inheritance',preexp
-       ! write(*,*)'age',age
-       ! write(*,*)'slip',slip
-            !write(*,*)'rmsw_sum',rmsw_sum
+        !write(*,*)
+        !write(*,*)'sr',SR2
+        !write(*,*)'inheritance',preexp
+        !write(*,*)'age',age
+        !write(*,*)'slip',slip
+    	!write(*,*)'rmsw_sum',rmsw_sum
 c-----	write result of Nef and cl36AMS
 !	open (unit = 20, file = "results.txt")
 !	do i=1,nl_data
 !		write(*,*)hauteur(i),cl36AMS(i),Nef(i)
 !	enddo
-
+!      
 	end
 
