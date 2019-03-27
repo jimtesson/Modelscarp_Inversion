@@ -1,7 +1,7 @@
 # Modelscarp inversion
    Modelscarp Inversion  Copyright (C) 2017  TESSON J. and BENEDETTI L. 2017
 
-[![DOI](https://zenodo.org/badge/99244458.svg)](https://zenodo.org/badge/latestdoi/99244458)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1464899.svg)](https://doi.org/10.5281/zenodo.1464899)
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@ Constraining the past seismic activity and the slip-rates of faults over several
 
 Please cite the use of this code using the following DOI:
 
-[![DOI](https://zenodo.org/badge/99244458.svg)](https://zenodo.org/badge/latestdoi/99244458)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1464899.svg)](https://doi.org/10.5281/zenodo.1464899)
+
 
 
 ## Getting Started
