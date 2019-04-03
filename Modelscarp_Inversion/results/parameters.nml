@@ -1,0 +1,32 @@
+ Epsilon =  0.0 mm.yr
+ Alpha = 20.0° Beta = 50.0° Gamma = 30.0°
+Total height of the scarp = 1600.0 cm
+Colluvium density =  2.0 g/cm3
+Rock density =  2.7 g/cm3
+Spallation production rate of in Ca = 42.2 at/gr/yr
+Radioactive decay constant for 36Cl = 0.2303E-05 /yr
+Attenuation length for fast neutron = 208.0 g/cm2
+
+ Pre-exhumation slip-rate is searched
+Min slip-rate =  0.0 mm/yr
+Max slip-rate =  5.0 mm/yr
+Std slip-rate =  0.5 mm/yr
+Long-term history duration =    300000. yr
+
+ Quiescence period prior exhumation is not allowed
+
+Min number of events =  1
+Max number of events = 20
+
+Min event ages=    0.0 yr
+Max event ages=  20000.0 yr
+
+Std. dev. of slip value changes =  20.00
+ cm
+Std. dev. of age value changes =    300.0 yr
+Std. dev. of birth/death events =    300.0 yr
+
+Burnin iterations =               300000
+Total number of iteration =              1200000
+Seed for random =    101
+Seed for random =    983

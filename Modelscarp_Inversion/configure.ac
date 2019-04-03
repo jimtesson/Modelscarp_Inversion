@@ -1,5 +1,5 @@
 AC_PREREQ([2.67])
-AC_INIT([rf], [0.9.2], [http://www.iearth.org.au/codes/RF])
+AC_INIT([Modelscarp Inversion], [1.0.0], [https://github.com/jimtesson/Modelscarp_Inversion])
 AM_INIT_AUTOMAKE([1.10 no-define subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 

@@ -13,6 +13,7 @@ MODEL_SOURCES = src/modelscarp/aicc.f \
 
 SHARED_SOURCES = src/shared/rf_types.f90 \
 	src/shared/utilities.f90 \
+	src/shared/LSD.f90 \
 	src/shared/forward_model.f90
 
 bin_PROGRAMS =$(top_builddir)/bin/Modelscarp_inv
@@ -22,6 +23,8 @@ __top_builddir__bin_Modelscarp_inv_FCFLAGS = $(RJMCMC_CFLAGS) -I/usr/include
 __top_builddir__bin_Modelscarp_inv_LDADD = $(RJMCMC_LIBS) 
 __top_builddir__bin_Modelscarp_inv_DEPENDENCIES =
 
-
+clean-local:
+	-rm -f *.mod
+	-rm -f src/shared/*.mod
 
 
